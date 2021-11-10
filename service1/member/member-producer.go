@@ -2,9 +2,8 @@ package member
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"os"
+	"time"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -14,25 +13,26 @@ const (
 	brokerAddress = "localhost:9092"
 )
 
-func Produce(newMember Member, ctx context.Context) {
+func Produce(newMember Member, context context.Context) {
 
-	fmt.Println("Trying to write new member: ", newMember)
+	log.Println("Trying to write new member: ", newMember)
 
-	logger := log.New(os.Stdout, "Kafka writer: ", 0)
-
-	w := kafka.NewWriter(kafka.WriterConfig{
-		Brokers: []string{brokerAddress},
-		Topic:   topic,
-		Logger:  logger,
-	})
-
-	err := w.WriteMessages(ctx, kafka.Message{
-		Key:   nil,
-		Value: []byte(newMember.String()),
-	})
+	conn, err := kafka.DialLeader(context, "tcp", brokerAddress, topic, 0)
 	if err != nil {
-		panic("could not write message " + err.Error())
+		log.Fatal("Failed to dial leader: ", err)
 	}
 
-	fmt.Println("Successfully added and published new member: ", newMember)
+	_ = conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	_, err = conn.WriteMessages(
+		kafka.Message{Value: []byte(newMember.String())},
+	)
+	if err != nil {
+		log.Fatal("Failed to write messages: ", err)
+	}
+
+	if err := conn.Close(); err != nil {
+		log.Fatal("Failed to close writer: ", err)
+	}
+
+	log.Println("Successfully added and published new member: ", newMember)
 }
