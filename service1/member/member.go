@@ -6,8 +6,6 @@ var Members = []Member{
 	{Name: "Foo", Group: "Bar"},
 }
 
-var Foobar string = "foo"
-
 type Member struct {
 	Name  string `json:"name"`
 	Group string `json:"group"`

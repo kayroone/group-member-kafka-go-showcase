@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/segmentio/kafka-go"
 	"log"
 	"time"
@@ -35,7 +34,10 @@ func consume() {
 		if err != nil {
 			break
 		}
-		fmt.Println("Serialisiert: ", messageToMember(bytes[:n]))
+
+		member := messageToMember(bytes[:n])
+		log.Printf("Received message: Member with name '%s' added to group '%s'",
+			member.Name, member.Group)
 	}
 
 	if err := batch.Close(); err != nil {
