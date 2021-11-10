@@ -13,11 +13,11 @@ const (
 	brokerAddress = "localhost:9092"
 )
 
-func Produce(newMember Member, context context.Context) {
+func Produce(newMember Member) {
 
 	log.Println("Trying to write new member: ", newMember)
 
-	conn, err := kafka.DialLeader(context, "tcp", brokerAddress, topic, 0)
+	conn, err := kafka.DialLeader(context.Background(), "tcp", brokerAddress, topic, 0)
 	if err != nil {
 		log.Fatal("Failed to dial leader: ", err)
 	}

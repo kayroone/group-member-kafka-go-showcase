@@ -1,7 +1,6 @@
 package member
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +19,8 @@ func AddMember(c *gin.Context) {
 
 	Members = append(Members, newMember)
 
-	ctx := context.Background()
-	Produce(newMember, ctx)
+	// Publish on kafka topic
+	Produce(newMember)
 
 	c.IndentedJSON(http.StatusCreated, newMember)
 }

@@ -1,4 +1,4 @@
-package member
+package main
 
 import "fmt"
 
@@ -15,5 +15,5 @@ type Member struct {
 
 func (m Member) String() string {
 
-	return fmt.Sprintf("{\"Name\": \"%s\", \"Group\": \"%s\"}", m.Name, m.Group)
+	return fmt.Sprintf("{Name: %s Group: %s}", m.Name, m.Group)
 }
