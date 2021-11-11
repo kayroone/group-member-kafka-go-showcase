@@ -2,10 +2,6 @@ package member
 
 import "fmt"
 
-var Members = []Member{
-	{Name: "Foo", Group: "Bar"},
-}
-
 type Member struct {
 	Name  string `json:"name"`
 	Group string `json:"group"`

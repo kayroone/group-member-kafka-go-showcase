@@ -25,7 +25,11 @@ func consume() {
 		log.Fatal("Failed to dial leader: <", err)
 	}
 
-	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	err = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	if err != nil {
+		log.Fatal("Failed to set read dead line: ", err)
+	}
+
 	batch := conn.ReadBatch(10e3, 1e6) // fetch 10KB min, 1MB max
 
 	bytes := make([]byte, 10e3) // 10KB max per message
@@ -35,7 +39,7 @@ func consume() {
 			break
 		}
 
-		member := messageToMember(bytes[:n])
+		member := MessageToMember(bytes[:n])
 		log.Printf("Received message: Member with name '%s' added to group '%s'",
 			member.Name, member.Group)
 	}
@@ -49,7 +53,7 @@ func consume() {
 	}
 }
 
-func messageToMember(messageBytes []byte) Member {
+func MessageToMember(messageBytes []byte) Member {
 
 	var member Member
 
