@@ -9,6 +9,11 @@ func main() {
 
 	// Start REST service to add new members
 	router := gin.Default()
+
 	router.POST("/test/:member", member.AddMember)
-	router.Run("localhost:8080")
+
+	err := router.Run("localhost:8080")
+	if err != nil {
+		return
+	}
 }

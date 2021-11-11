@@ -17,8 +17,6 @@ func AddMember(c *gin.Context) {
 		return
 	}
 
-	Members = append(Members, newMember)
-
 	// Publish on kafka topic
 	Produce(newMember)
 
