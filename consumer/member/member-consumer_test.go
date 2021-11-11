@@ -1,15 +1,22 @@
 package main
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
-func TestMessageToMembers(t *testing.T) {
+func TestMessageToMembersValidJson(t *testing.T) {
 
-	messageBytes := []byte("{\"Name\": \"foo\", \"Group\": \"bar\"}")
+	validMessageBytes := []byte("{\"Name\": \"foo\", \"Group\": \"bar\"}")
+	got := MessageToMember(validMessageBytes)
 	want := Member{Name: "foo", Group: "bar"}
 
-	got := MessageToMember(messageBytes)
+	assert.Equal(t, got, want)
+}
 
-	if got != want {
-		t.Errorf("got %q, wanted %q", got, want)
-	}
+func TestMessageToMembersInvalidJson(t *testing.T) {
+
+	invalidMessageBytes := []byte("{\"Name\": \"foo\", \"Group\": \"bar\"")
+
+	assert.Panics(t, func() { MessageToMember(invalidMessageBytes) }, "MessageToMember did not panic")
 }
