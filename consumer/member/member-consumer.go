@@ -45,11 +45,11 @@ func consume() {
 	}
 
 	if err := batch.Close(); err != nil {
-		log.Fatal("failed to close batch:", err)
+		log.Fatal("Failed to close batch: ", err)
 	}
 
 	if err := conn.Close(); err != nil {
-		log.Fatal("failed to close connection:", err)
+		log.Fatal("Failed to close connection: ", err)
 	}
 }
 
