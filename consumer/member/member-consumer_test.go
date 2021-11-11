@@ -18,5 +18,6 @@ func TestMessageToMembersInvalidJson(t *testing.T) {
 
 	invalidMessageBytes := []byte("{\"Name\": \"foo\", \"Group\": \"bar\"")
 
-	assert.Panics(t, func() { MessageToMember(invalidMessageBytes) }, "MessageToMember did not panic")
+	assert.Panics(t, func() { MessageToMember(invalidMessageBytes) },
+		"MessageToMember did not panic")
 }
