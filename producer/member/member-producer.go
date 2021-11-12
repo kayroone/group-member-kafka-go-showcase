@@ -2,10 +2,8 @@ package member
 
 import (
 	"context"
-	"log"
-	"time"
-
 	"github.com/segmentio/kafka-go"
+	"log"
 )
 
 const (
@@ -17,20 +15,22 @@ func Produce(newMember Member) {
 
 	log.Println("Trying to write new member: ", newMember)
 
-	conn, err := kafka.DialLeader(context.Background(), "tcp", brokerAddress, topic, 0)
-	if err != nil {
-		log.Fatal("Failed to dial leader: ", err)
+	w := &kafka.Writer{
+		Addr:     kafka.TCP(brokerAddress),
+		Topic:    topic,
+		Balancer: &kafka.LeastBytes{},
 	}
 
-	_ = conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	_, err = conn.WriteMessages(
-		kafka.Message{Value: []byte(newMember.String())},
+	err := w.WriteMessages(context.Background(),
+		kafka.Message{
+			Value: []byte(newMember.String()),
+		},
 	)
 	if err != nil {
 		log.Fatal("Failed to write messages: ", err)
 	}
 
-	if err := conn.Close(); err != nil {
+	if err := w.Close(); err != nil {
 		log.Fatal("Failed to close writer: ", err)
 	}
 

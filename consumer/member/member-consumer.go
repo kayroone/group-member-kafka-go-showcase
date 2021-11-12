@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/segmentio/kafka-go"
 	"log"
-	"time"
 )
 
 const (
@@ -20,36 +20,36 @@ func main() {
 
 func consume() {
 
-	conn, err := kafka.DialLeader(context.Background(), "tcp", brokerAddress, topic, 0)
-	if err != nil {
-		log.Fatal("Failed to dial leader: <", err)
-	}
-
-	err = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-	if err != nil {
-		log.Fatal("Failed to set read dead line: ", err)
-	}
-
-	batch := conn.ReadBatch(10e3, 1e6) // fetch 10KB min, 1MB max
-
-	bytes := make([]byte, 10e3) // 10KB max per message
-	for {
-		n, err := batch.Read(bytes)
+	r := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:   []string{brokerAddress},
+		Topic:     topic,
+		Partition: 0,
+		MinBytes:  10e3, // 10KB
+		MaxBytes:  10e6, // 10MB
+	})
+	defer func() {
+		err := r.Close()
 		if err != nil {
+			log.Fatal("Failed to close reader connection")
+			return
+		}
+		log.Println("Successfully closed reader connection")
+	}()
+
+	for {
+		message, err := r.ReadMessage(context.Background())
+		if err != nil {
+			log.Println("Error reading message: ", err)
 			break
 		}
 
-		member := MessageToMember(bytes[:n])
-		log.Printf("Received message: Member with name '%s' added to group '%s'",
-			member.Name, member.Group)
+		member := MessageToMember(message.Value)
+
+		fmt.Printf("Received message at offset %d: %s\n", message.Offset, member)
 	}
 
-	if err := batch.Close(); err != nil {
-		log.Fatal("Failed to close batch: ", err)
-	}
-
-	if err := conn.Close(); err != nil {
-		log.Fatal("Failed to close connection: ", err)
+	if err := r.Close(); err != nil {
+		log.Fatal("Failed to close reader: ", err)
 	}
 }
 

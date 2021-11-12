@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"jwiegmann.de/group-member-service1/member"
+	"jwiegmann.de/producer/member"
 	"log"
 )
 
-const address = "http://localhost:8080"
+const address = "localhost:8080"
 
 func main() {
 
