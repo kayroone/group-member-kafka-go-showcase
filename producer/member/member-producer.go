@@ -8,7 +8,7 @@ import (
 
 const (
 	topic         = "new-members"
-	brokerAddress = "localhost:9092"
+	brokerAddress = "redpanda:29092"
 )
 
 func Produce(newMember Member) {
