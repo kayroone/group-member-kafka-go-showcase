@@ -18,7 +18,7 @@ func AddMember(c *gin.Context) {
 	}
 
 	// Publish on kafka topic
-	Produce(newMember)
+	go Produce(newMember)
 
 	c.IndentedJSON(http.StatusCreated, newMember)
 }

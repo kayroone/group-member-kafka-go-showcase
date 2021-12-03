@@ -8,16 +8,17 @@ import (
 func TestMessageToMembersValidJson(t *testing.T) {
 
 	validMessageBytes := []byte("{\"Name\": \"foo\", \"Group\": \"bar\"}")
-	got := MessageToMember(validMessageBytes)
+	got, err := MessageToMember(validMessageBytes)
 	want := Member{Name: "foo", Group: "bar"}
 
+	assert.Nil(t, err)
 	assert.Equal(t, got, want)
 }
 
 func TestMessageToMembersInvalidJson(t *testing.T) {
 
 	invalidMessageBytes := []byte("{\"Name\": \"foo\", \"Group\": \"bar\"")
+	_, err := MessageToMember(invalidMessageBytes)
 
-	assert.Panics(t, func() { MessageToMember(invalidMessageBytes) },
-		"MessageToMember did not panic")
+	assert.NotNil(t, err)
 }

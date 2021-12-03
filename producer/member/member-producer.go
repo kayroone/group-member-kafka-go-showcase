@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	topic         = "new-members"
-	brokerAddress = "redpanda:29092"
+	topic = "new-members"
+	//brokerAddress = "redpanda:29092"
+	brokerAddress = "localhost:9092"
 )
 
 func Produce(newMember Member) {
@@ -20,6 +21,13 @@ func Produce(newMember Member) {
 		Topic:    topic,
 		Balancer: &kafka.LeastBytes{},
 	}
+	defer func() {
+		err := w.Close()
+		if err != nil {
+			log.Fatal("Failed to close reader connection")
+			return
+		}
+	}()
 
 	err := w.WriteMessages(context.Background(),
 		kafka.Message{
@@ -28,10 +36,6 @@ func Produce(newMember Member) {
 	)
 	if err != nil {
 		log.Fatal("Failed to write messages: ", err)
-	}
-
-	if err := w.Close(); err != nil {
-		log.Fatal("Failed to close writer: ", err)
 	}
 
 	log.Println("Successfully added and published new member: ", newMember)
